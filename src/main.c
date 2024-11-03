@@ -3,60 +3,19 @@
 #include <stdio.h>
 #include <stdint.h>
 
+TIM_TimeBaseInitType TIM_TimeBaseStructure;
+
 /**
  * @brief  Inserts a delay time.
  * @param count specifies the delay time length.
  */
 void Delay(uint32_t count)
 {
-    for (; count > 0; count--)
+    volatile uint32_t c = count;
+    for (; c > 0; c--)
         ;
 }
 
-/**
- * @brief  Configures LED GPIO.
- * @param GPIOx x can be A to G to select the GPIO port.
- * @param Pin This parameter can be GPIO_PIN_0~GPIO_PIN_15.
- */
-void LedInit(GPIO_Module* GPIOx, uint16_t Pin)
-{
-    GPIO_InitType GPIO_InitStructure;
-
-    /* Check the parameters */
-    assert_param(IS_GPIO_ALL_PERIPH(GPIOx));
-
-    /* Enable the GPIO Clock */
-    if (GPIOx == GPIOA)
-    {
-        RCC_EnableAPB2PeriphClk(RCC_APB2_PERIPH_GPIOA, ENABLE);
-    }
-    else if (GPIOx == GPIOB)
-    {
-        RCC_EnableAPB2PeriphClk(RCC_APB2_PERIPH_GPIOB, ENABLE);
-    }
-    else if (GPIOx == GPIOC)
-    {
-        RCC_EnableAPB2PeriphClk(RCC_APB2_PERIPH_GPIOC, ENABLE);
-    }
-    else
-    {
-        if (GPIOx == GPIOD)
-        {
-            RCC_EnableAPB2PeriphClk(RCC_APB2_PERIPH_GPIOD, ENABLE);
-        }
-    }
-
-    /* Configure the GPIO pin */
-    if (Pin <= GPIO_PIN_ALL)
-    {
-        GPIO_InitStruct(&GPIO_InitStructure);
-        GPIO_InitStructure.Pin        = Pin;
-        GPIO_InitStructure.GPIO_Current = GPIO_DC_4mA;
-        GPIO_InitStructure.GPIO_Pull    = GPIO_No_Pull;
-        GPIO_InitStructure.GPIO_Mode  = GPIO_Mode_Out_PP;
-        GPIO_InitPeripheral(GPIOx, &GPIO_InitStructure);
-    }
-}
 /**
  * @brief  Turns selected Led on as output low level.
  * @param GPIOx x can be A to G to select the GPIO port.
@@ -111,25 +70,57 @@ void assert_failed(const uint8_t* expr, const uint8_t* file, uint32_t line)
 #endif // USE_FULL_ASSERT
 
 /**
- * @brief  Main program.
+ * @brief  Configures tim1 clocks.
  */
+void TIM_Configuration(void)
+{
+    /* Compute the prescaler value */
+    uint16_t PrescalerValue = (uint16_t) (SystemCoreClock / 120000) - 1;
+
+    /* Time base configuration */
+    TIM_InitTimBaseStruct(&TIM_TimeBaseStructure);    
+    TIM_TimeBaseStructure.Period    = 65535;
+    TIM_TimeBaseStructure.Prescaler = 0;
+    TIM_TimeBaseStructure.ClkDiv    = 0;
+    TIM_TimeBaseStructure.CntMode   = TIM_CNT_MODE_UP;
+
+    TIM_InitTimeBase(TIM1, &TIM_TimeBaseStructure);
+
+    /* Prescaler configuration */
+    TIM_ConfigPrescaler(TIM1, PrescalerValue, TIM_PSC_RELOAD_MODE_IMMEDIATE);
+
+    /* TIM1 enable update irq */
+    TIM_ConfigInt(TIM1, TIM_INT_UPDATE, ENABLE);
+
+    /* TIM1 enable counter */
+    TIM_Enable(TIM1, ENABLE);
+}
+
 int main(void)
 {
-    /*SystemInit() function has been called by startup file startup_n32l40x.s*/
-
-    LedInit(PORT_GROUP1, LED1_PIN);
-
-    /*Turn on Led1*/
-    LedOn(PORT_GROUP1, LED1_PIN);
+    board_init();
+    LedOn(LED1_PORT, LED1_PIN); /*Turn on Led1*/
+    TIM_Configuration();
+    oled_init();
 
     while (1)
     {
-        LedBlink(PORT_GROUP1, LED1_PIN);
+        
 
         /* Insert delay */
         Delay(0x28FFFF);
     }
 }
+
 /**
- * @}
+ * @brief  This function handles TIM1 update interrupt request.
  */
+void TIM1_UP_IRQHandler(void)
+{
+    if (TIM_GetIntStatus(TIM1, TIM_INT_UPDATE) != RESET)
+    {
+        TIM_ClrIntPendingBit(TIM1, TIM_INT_UPDATE);
+
+        LedBlink(LED1_PORT, LED1_PIN);
+    }
+}

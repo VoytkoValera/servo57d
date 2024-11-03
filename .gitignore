@@ -56,3 +56,6 @@ dkms.conf
 /compile_commands.json
 /Makefile
 /servo57.bin
+build/build.ninja
+build/.ninja_log
+build/.ninja_deps

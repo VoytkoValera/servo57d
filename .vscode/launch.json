@@ -7,7 +7,7 @@
         {
             "name": "Cortex Debug",
             "cwd": "${workspaceFolder}",
-            "executable": "${workspaceFolder}/blink",
+            "executable": "${workspaceFolder}/servo57.elf",
             "request": "launch",
             "type": "cortex-debug",
             "runToEntryPoint": "main",

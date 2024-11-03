@@ -32,8 +32,7 @@
  *
  * @copyright Copyright (c) 2022, Nations Technologies Inc. All rights reserved.
  */
-#include "n32l40x_it.h"
-#include "n32l40x.h"
+#include "board.h"
 
 /** @addtogroup N32L40X_StdPeriph_Template
  * @{
