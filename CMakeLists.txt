@@ -13,6 +13,14 @@ set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 # This is the toolchain file, we use the arm-none-eabi toolchain
 set(CMAKE_TOOLCHAIN_FILE ${CMAKE_MODULE_PATH}/arm-gcc-toolchain.cmake)
 
+find_package(Git)
+add_custom_target(version
+  ${CMAKE_COMMAND} -D SRC=${CMAKE_SOURCE_DIR}/fw_version.h.in
+                   -D DST=${CMAKE_BINARY_DIR}/fw_version.h
+                   -D GIT_EXECUTABLE=${GIT_EXECUTABLE}
+                   -P ${CMAKE_MODULE_PATH}/GenerateVersionHeader.cmake
+  )
+
 #---------------------------------------------------------------------------------------
 # Set debug/release build configuration Options
 #---------------------------------------------------------------------------------------
@@ -54,7 +62,7 @@ set(CMAKE_ASM_FLAGS "${OBJECT_GEN_FLAGS} -x assembler-with-cpp " CACHE INTERNAL 
 
 
 project(servo57 LANGUAGES C ASM VERSION 1.0.0)
-
+set(CMAKE_C_FLAGS   "${CMAKE_C_FLAGS} -DVERSION=\"${CMAKE_PROJECT_VERSION}\"")
 set(SDK_DIR                        ${PROJECT_SOURCE_DIR}/SDK CACHE PATH "N32 SDK directory")
 
   # -Wl,--gc-sections     Perform the dead code elimination.
@@ -65,9 +73,11 @@ set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,-gc-sections,--print-m
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -T ${SDK_DIR}/CMSIS/device/n32l40x_flash.ld")
 
 include_directories(${PROJECT_SOURCE_DIR}/include)
+include_directories(${PROJECT_SOURCE_DIR}/RTT)
 include_directories(${SDK_DIR}/CMSIS/core)
 include_directories(${SDK_DIR}/CMSIS/device)
 include_directories(${SDK_DIR}/n32l40x_std_periph_driver/inc)
+include_directories(${CMAKE_BINARY_DIR})
 
 set(SDK_SOURCES
     ${SDK_DIR}/CMSIS/device/system_n32l40x.c
@@ -83,8 +93,14 @@ set(SDK_SOURCES
     ${SDK_DIR}/n32l40x_std_periph_driver/src/n32l40x_tim.c
   )
 
+set(RTT_SOURCES
+  ${PROJECT_SOURCE_DIR}/RTT/SEGGER_RTT_ASM_ARMv7M.s
+  ${PROJECT_SOURCE_DIR}/RTT/SEGGER_RTT_printf.c
+  ${PROJECT_SOURCE_DIR}/RTT/SEGGER_RTT.c
+)
 set(SOURCE_FILES
     ${SDK_SOURCES}
+    ${RTT_SOURCES}
     src/main.c
     src/n32l40x_it.c
     src/drivers/board.c
@@ -95,6 +111,7 @@ set(HEX_FILE ${PROJECT_BINARY_DIR}/${PROJECT_NAME}.hex)
 set(BIN_FILE ${PROJECT_BINARY_DIR}/${PROJECT_NAME}.bin)
 
 add_executable(${PROJECT_NAME}.elf ${SOURCE_FILES})
+add_dependencies(${PROJECT_NAME}.elf version)
 
 add_custom_command(TARGET ${PROJECT_NAME}.elf POST_BUILD  
 COMMAND ${CMAKE_OBJCOPY} -Oihex $<TARGET_FILE:${PROJECT_NAME}.elf> ${HEX_FILE}

@@ -60,7 +60,7 @@ void board_init(void) {
     i2c1_master.OwnAddr1    = I2C_MASTER_ADDR;
     i2c1_master.AckEnable   = I2C_ACKEN;
     i2c1_master.AddrMode    = I2C_ADDR_MODE_7BIT;
-    i2c1_master.ClkSpeed    = 50000; // 50K
+    i2c1_master.ClkSpeed    = 100000; // 100K
 
     I2C_Init(I2C1, &i2c1_master);
     I2C_Enable(I2C1, ENABLE);

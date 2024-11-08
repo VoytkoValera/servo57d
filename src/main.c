@@ -2,6 +2,8 @@
 #include "board.h"
 #include <stdio.h>
 #include <stdint.h>
+#include <SEGGER_RTT.h>
+#include "fw_version.h"
 
 TIM_TimeBaseInitType TIM_TimeBaseStructure;
 
@@ -98,15 +100,18 @@ void TIM_Configuration(void)
 
 int main(void)
 {
+    int cnt = 0;
+    SEGGER_RTT_Init();
+    print_log("MKS Servo57d v.%s\n", FW_VERSION);
     board_init();
     LedOn(LED1_PORT, LED1_PIN); /*Turn on Led1*/
     TIM_Configuration();
     oled_init();
 
     while (1)
-    {
-        
-
+    {       
+        oled_write(cnt++);
+        if(cnt>999) cnt = 0;
         /* Insert delay */
         Delay(0x28FFFF);
     }
@@ -123,4 +128,12 @@ void TIM1_UP_IRQHandler(void)
 
         LedBlink(LED1_PORT, LED1_PIN);
     }
+}
+
+void print_log(const char * sFormat, ...)
+{	
+	va_list ParamList;
+	va_start(ParamList, sFormat);
+	SEGGER_RTT_vprintf(0, sFormat, &ParamList);
+	va_end(ParamList);
 }
