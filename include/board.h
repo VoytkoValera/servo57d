@@ -19,10 +19,12 @@ extern "C" {
 
 // I2C Configuration
 #define SSD1306_SCL         GPIO_PIN_4
-#define SSD1306_SDA         GPIO_PIN_4
+#define SSD1306_SDA         GPIO_PIN_5
+#define SSD1306_RESET       GPIO_PIN_2
 #define SSD1306_PORT        GPIOA
-#define SSD1306_I2C_ADDR    0x3C //(0x3C << 1)
-#define I2C_MASTER_ADDR     0x30
+#define SSD1306_RPORT       GPIOB
+#define SSD1306_I2C_ADDR    (0x3C << 1)
+#define I2C_MASTER_ADDR     0x0
 // The width of the screen can be set using this
 // define. The default value is 128.
 #define SSD1306_WIDTH           64

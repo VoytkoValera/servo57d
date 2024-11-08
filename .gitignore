@@ -59,3 +59,4 @@ dkms.conf
 build/build.ninja
 build/.ninja_log
 build/.ninja_deps
+/build
