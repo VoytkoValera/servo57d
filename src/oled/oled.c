@@ -1,7 +1,6 @@
 #include "board.h"
-#include <math.h>
 #include <stdlib.h>
-#include <string.h>  // For memcpy
+#include <string.h>  // For memset
 
 #define I2CT_FLAG_TIMEOUT ((uint32_t)0x1000)
 #define I2CT_LONG_TIMEOUT ((uint32_t)(10 * I2CT_FLAG_TIMEOUT))

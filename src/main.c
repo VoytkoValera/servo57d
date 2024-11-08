@@ -100,7 +100,6 @@ void TIM_Configuration(void)
 
 int main(void)
 {
-    int cnt = 0;
     SEGGER_RTT_Init();
     print_log("MKS Servo57d v.%s\n", FW_VERSION);
     board_init();
@@ -110,10 +109,11 @@ int main(void)
 
     while (1)
     {       
-        oled_write(cnt++);
-        if(cnt>999) cnt = 0;
         /* Insert delay */
         Delay(0x28FFFF);
+        uint16_t sample = mt6816_read();
+        float angle = (360.0 / 16384.0) * sample;
+        oled_write((uint16_t)angle);
     }
 }
 

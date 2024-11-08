@@ -29,9 +29,32 @@ extern "C" {
 
 /* Encoder MT6816 */
 
+#define MT6816_PORT         GPIOB
+#define MT6816_MOSI         GPIO_PIN_5
+#define MT6816_MISO         GPIO_PIN_4
+#define MT6816_CLK          GPIO_PIN_3
+#define MT6816_CS           GPIO_PIN_6
+
+/* Current ADC */
+
+#define CURRENT_A           GPIO_PIN_2
+#define CURRENT_B           GPIO_PIN_1
+
+/* Stepper drivers */
+
+#define PHASE_A_PORT        GPIOA
+#define PHASE_A1_PIN        GPIO_PIN_6
+#define PHASE_A2_PIN        GPIO_PIN_7
+#define PHASE_B_PORT        GPIOB
+#define PHASE_B1_PIN        GPIO_PIN_0
+#define PHASE_B2_PIN        GPIO_PIN_1
+
+/* Prototypes */
 
 void board_init(void);
 void oled_init(void);
+void mt6816_init(void);
+uint16_t mt6816_read(void);
 // RTT print
 void print_log(const char * sFormat, ...);
 

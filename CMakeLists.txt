@@ -104,6 +104,7 @@ set(SOURCE_FILES
     src/main.c
     src/n32l40x_it.c
     src/drivers/board.c
+    src/drivers/mt6816.c
     src/oled/oled.c
 	)
 

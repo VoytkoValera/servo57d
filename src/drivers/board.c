@@ -12,14 +12,14 @@ void board_init(void) {
     RCC_ConfigPclk2(RCC_HCLK_DIV4);
 
     // --- RCC Init     
-    RCC_EnableAPB2PeriphClk(RCC_APB2_PERIPH_TIM1, ENABLE); /* TIM1 clock enable */
     RCC_EnableAPB1PeriphClk(RCC_APB1_PERIPH_I2C1, ENABLE);
-    RCC_EnableAPB2PeriphClk(RCC_APB2_PERIPH_AFIO, ENABLE);
-    RCC_EnableAPB2PeriphClk(RCC_APB2_PERIPH_GPIOA, ENABLE);  // I2C1
-    RCC_EnableAPB2PeriphClk(RCC_APB2_PERIPH_GPIOB, ENABLE);  // OLED reset
-    // RCC_EnableAPB2PeriphClk(RCC_APB2_PERIPH_GPIOC, ENABLE);
-    RCC_EnableAPB2PeriphClk(RCC_APB2_PERIPH_GPIOD, ENABLE); // LED1
-
+    RCC_EnableAPB2PeriphClk(
+            RCC_APB2_PERIPH_SPI1  |
+            RCC_APB2_PERIPH_TIM1  |
+            RCC_APB2_PERIPH_AFIO  |
+            RCC_APB2_PERIPH_GPIOA |  // I2C1
+            RCC_APB2_PERIPH_GPIOB |  // SPI1
+            RCC_APB2_PERIPH_GPIOD, ENABLE); // LED1
 
     // --- Timers
     NVIC_InitStructure.NVIC_IRQChannel                   = TIM1_UP_IRQn;
@@ -64,8 +64,6 @@ void board_init(void) {
 
     I2C_Init(I2C1, &i2c1_master);
     I2C_Enable(I2C1, ENABLE);
-
-
-    
-    // --- SPI ()
+ 
+    mt6816_init();
 }
