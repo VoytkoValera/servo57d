@@ -66,4 +66,5 @@ void board_init(void) {
     I2C_Enable(I2C1, ENABLE);
  
     mt6816_init();
+    stepper_init();
 }

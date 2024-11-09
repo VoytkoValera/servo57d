@@ -54,6 +54,9 @@ extern "C" {
 void board_init(void);
 void oled_init(void);
 void mt6816_init(void);
+void stepper_init(void);
+
+
 uint16_t mt6816_read(void);
 // RTT print
 void print_log(const char * sFormat, ...);

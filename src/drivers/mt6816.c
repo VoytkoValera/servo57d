@@ -1,6 +1,9 @@
 #include "board.h"
 #include <stdlib.h>
 
+#define CS_LOW   MT6816_PORT->PBC = MT6816_CS
+#define CS_HIGH  MT6816_PORT->PBSC = MT6816_CS
+
 static uint16_t buf[2];
 
 void mt6816_init(void) {
@@ -52,20 +55,18 @@ void mt6816_init(void) {
 uint16_t mt6816_read(void) {
     buf[0] = 0x8300;
     buf[1] = 0x8400;
-    MT6816_PORT->PBC = MT6816_CS; // CS Low
-    MT6816_PORT->PBC = MT6816_CS; // CS Low
+    CS_LOW;
     SPI_I2S_TransmitData(SPI1, buf[0]);
     while (SPI_I2S_GetStatus(SPI1, SPI_I2S_RNE_FLAG) == RESET);
     buf[0] = SPI_I2S_ReceiveData(SPI1);
-    MT6816_PORT->PBSC = MT6816_CS; // CS High
-    MT6816_PORT->PBSC = MT6816_CS; // CS High
+    CS_HIGH;
 
-    MT6816_PORT->PBC = MT6816_CS; // CS Low
-    MT6816_PORT->PBC = MT6816_CS; // CS Low
+    CS_LOW;
     SPI_I2S_TransmitData(SPI1, buf[1]);
     while (SPI_I2S_GetStatus(SPI1, SPI_I2S_RNE_FLAG) == RESET);
     buf[1] = SPI_I2S_ReceiveData(SPI1);
-    MT6816_PORT->PBSC = MT6816_CS; // CS High
+    CS_HIGH;
+    
     uint16_t sample = ((buf[0] & 0x00FF) << 8) | (buf[1] & 0x00FF);
     print_log("RX %04x\n", sample);
     return sample>>2;

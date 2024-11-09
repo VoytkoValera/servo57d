@@ -105,7 +105,8 @@ set(SOURCE_FILES
     src/n32l40x_it.c
     src/drivers/board.c
     src/drivers/mt6816.c
-    src/oled/oled.c
+    src/drivers/oled.c
+    src/drivers/stepper.c
 	)
 
 set(HEX_FILE ${PROJECT_BINARY_DIR}/${PROJECT_NAME}.hex)
