@@ -36,7 +36,7 @@ void mt6816_init(void) {
     GPIO_InitStructure.GPIO_Pull    = GPIO_No_Pull;
     GPIO_InitStructure.GPIO_Mode    = GPIO_Mode_Out_PP;
     GPIO_InitPeripheral(MT6816_PORT, &GPIO_InitStructure);
-    MT6816_PORT->PBSC = MT6816_CS; // CS High
+    CS_HIGH;
 
     SPI_InitStructure.DataDirection = SPI_DIR_DOUBLELINE_FULLDUPLEX;
     SPI_InitStructure.SpiMode       = SPI_MODE_MASTER;
@@ -68,6 +68,6 @@ uint16_t mt6816_read(void) {
     CS_HIGH;
     
     uint16_t sample = ((buf[0] & 0x00FF) << 8) | (buf[1] & 0x00FF);
-    print_log("RX %04x\n", sample);
+    //print_log("RX %04x\n", sample);
     return sample>>2;
 }

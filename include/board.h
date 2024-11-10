@@ -16,6 +16,26 @@ extern "C" {
 #define LED1_PORT   GPIOD
 #define LED1_PIN    GPIO_PIN_0
 
+/* Buttons */
+
+#define BTN1_PORT   GPIOB
+#define BTN1_PIN    GPIO_PIN_9 /* Menu */
+#define BTN2_PIN    GPIO_PIN_8 /* Enter */
+#define BTN3_PORT   GPIOA
+#define BTN3_PIN    GPIO_PIN_3 /* Next */
+
+/* Externals */
+
+#define EXT1_PORT   GPIOA
+#define EXT1_PIN    GPIO_PIN_8 /* nDIR */
+#define EXT2_PIN    GPIO_PIN_0 /* nSTP */
+#define EXT3_PORT   GPIOB
+#define EXT3_PIN    GPIO_PIN_7 /* nEN */
+#define EXT4_PIN    GPIO_PIN_12 /* M_IN2 */
+#define EXT5_PIN    GPIO_PIN_13 /* M_IN1 */
+#define EXT6_PIN    GPIO_PIN_14 /* M_OUT1 */
+#define EXT7_PIN    GPIO_PIN_15 /* M_OUT2 */
+
 /* OLED ssd1306 */
 
 // I2C Configuration
@@ -53,13 +73,24 @@ extern "C" {
 
 void board_init(void);
 void oled_init(void);
+void led_init(void);
 void mt6816_init(void);
 void stepper_init(void);
+void buttons_init(void);
+void external_init(void);
 
+void buttons_tick(void);
+void ext_set(uint16_t pin, uint8_t val);
+
+void stepper_set_speed(int8_t speed);
 
 uint16_t mt6816_read(void);
 // RTT print
 void print_log(const char * sFormat, ...);
+
+void LedOn(void);
+void LedOff(void);
+void LedBlink(void);
 
 #ifdef __cplusplus
 }

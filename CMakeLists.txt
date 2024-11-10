@@ -102,10 +102,12 @@ set(SOURCE_FILES
     ${SDK_SOURCES}
     ${RTT_SOURCES}
     src/main.c
-    src/n32l40x_it.c
     src/drivers/board.c
+    src/drivers/button.c
+    src/drivers/external.c
     src/drivers/mt6816.c
     src/drivers/oled.c
+    src/drivers/led.c
     src/drivers/stepper.c
 	)
 
