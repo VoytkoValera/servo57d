@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="1">
+    <builddir>main-cppcheck-build-dir</builddir>
+    <platform>arm32-wchar_t2.xml</platform>
+    <importproject>build/compile_commands.json</importproject>
+    <analyze-all-vs-configs>false</analyze-all-vs-configs>
+    <parser>clang</parser>
+    <check-headers>true</check-headers>
+    <check-unused-templates>true</check-unused-templates>
+    <inline-suppression>true</inline-suppression>
+    <max-ctu-depth>2</max-ctu-depth>
+    <max-template-recursion>100</max-template-recursion>
+    <exclude>
+        <path name="RTT/"/>
+        <path name="SDK/"/>
+    </exclude>
+    <addons>
+        <addon>misra</addon>
+    </addons>
+    <tools>
+        <tool>clang-tidy</tool>
+    </tools>
+    <project-name>main</project-name>
+</project>

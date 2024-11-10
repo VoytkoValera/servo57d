@@ -61,3 +61,4 @@ build/.ninja_log
 build/.ninja_deps
 /build
 /fw_version.h
+/main-cppcheck-build-dir
