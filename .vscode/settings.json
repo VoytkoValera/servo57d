@@ -1,0 +1,13 @@
+{
+    "files.associations": {
+        "freertos.h": "c",
+        "delay.h": "c",
+        "log.h": "c",
+        "stdlib.h": "c",
+        "board.h": "c"
+    },
+    "C_Cpp.errorSquiggles": "disabled",
+    "cSpell.enableFiletypes": [
+        "!c"
+    ]
+}

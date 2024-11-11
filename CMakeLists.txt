@@ -54,21 +54,53 @@ add_custom_target(version
 # -fdata-sections       Place each data item into its own section in the output file.
 # -fomit-frame-pointer  Omit the frame pointer in functions that don’t need one.
 # -mabi=aapcs           Defines enums to be a variable sized type.
-set(OBJECT_GEN_FLAGS "-Og -g -mcpu=cortex-m4 -mthumb -fno-builtin -Wall -ffunction-sections -fdata-sections -fomit-frame-pointer -mabi=aapcs")
+set(OBJECT_GEN_FLAGS "-Og -g -mcpu=cortex-m4 -mthumb -fno-builtin -Wall -ffunction-sections -fdata-sections -fomit-frame-pointer -mabi=aapcs -mfloat-abi=hard")
 
 set(CMAKE_C_FLAGS   "${OBJECT_GEN_FLAGS} -std=gnu99 " CACHE INTERNAL "C Compiler options")
 set(CMAKE_CXX_FLAGS "${OBJECT_GEN_FLAGS} -std=c++11 " CACHE INTERNAL "C++ Compiler options")
 set(CMAKE_ASM_FLAGS "${OBJECT_GEN_FLAGS} -x assembler-with-cpp " CACHE INTERNAL "ASM Compiler options")
 
+add_definitions(-DxPortSysTickHandler=SysTick_Handler)
+add_definitions(-DvPortSVCHandler=SVC_Handler)
+add_definitions(-DxPortPendSVHandler=PendSV_Handler)
 
-project(servo57 LANGUAGES C ASM VERSION 1.0.0)
+project(servo57 LANGUAGES CXX C ASM VERSION 1.0.0)
+
+
+option(USE_FREERTOS "Use FreeRTOS" ON)
+
+if(USE_FREERTOS)
+
+  set(FREERTOS_KERNEL_PATH "freertos/")
+  add_library(freertos_config INTERFACE)
+  target_include_directories(freertos_config
+      INTERFACE
+      "include"
+  )
+
+    # Select the heap port.  values between 1-4 will pick a heap.
+  set(FREERTOS_HEAP "4" CACHE STRING "" FORCE)
+
+  # Select the native compile PORT
+  set(FREERTOS_PORT "GCC_ARM_CM4F" CACHE STRING "" FORCE)
+
+  add_subdirectory(${FREERTOS_KERNEL_PATH} FreeRTOS-Kernel)
+
+
+endif()
+
+add_subdirectory(etl)
+
+add_definitions(-DN32L40X)
+add_definitions(-DSERVO42D)
+
 set(CMAKE_C_FLAGS   "${CMAKE_C_FLAGS} -DVERSION=\"${CMAKE_PROJECT_VERSION}\"")
 set(SDK_DIR                        ${PROJECT_SOURCE_DIR}/SDK CACHE PATH "N32 SDK directory")
 
   # -Wl,--gc-sections     Perform the dead code elimination.
 # --specs=nano.specs    Link with newlib-nano.
 # --specs=nosys.specs   No syscalls, provide empty implementations for the POSIX system calls.
-set(CMAKE_EXE_LINKER_FLAGS "-nostdlib -lgcc -lc_nano -mthumb -mabi=aapcs" CACHE INTERNAL "Linker options")
+set(CMAKE_EXE_LINKER_FLAGS "--specs=nano.specs --specs=nosys.specs -lnosys -lgcc -lc_nano -mthumb -mabi=aapcs" CACHE INTERNAL "Linker options")
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,-gc-sections,--print-memory-usage,-Map=${CMAKE_PROJECT_NAME}.map")
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -T ${SDK_DIR}/CMSIS/device/n32l40x_flash.ld")
 
@@ -101,7 +133,7 @@ set(RTT_SOURCES
 set(SOURCE_FILES
     ${SDK_SOURCES}
     ${RTT_SOURCES}
-    src/main.c
+    src/main.cpp
     src/drivers/board.c
     src/drivers/button.c
     src/drivers/external.c
@@ -109,12 +141,21 @@ set(SOURCE_FILES
     src/drivers/oled.c
     src/drivers/led.c
     src/drivers/stepper.c
+    src/utils/delay.c
+    src/utils/log.c
 	)
 
 set(HEX_FILE ${PROJECT_BINARY_DIR}/${PROJECT_NAME}.hex)
 set(BIN_FILE ${PROJECT_BINARY_DIR}/${PROJECT_NAME}.bin)
 
 add_executable(${PROJECT_NAME}.elf ${SOURCE_FILES})
+
+if(USE_FREERTOS)
+  target_link_libraries(${PROJECT_NAME}.elf freertos_kernel freertos_config)
+  set_property(TARGET freertos_kernel PROPERTY C_STANDARD 90)
+endif()
+
+
 add_dependencies(${PROJECT_NAME}.elf version)
 
 add_custom_command(TARGET ${PROJECT_NAME}.elf POST_BUILD  

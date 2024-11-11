@@ -22,7 +22,7 @@ void board_init(void) {
             RCC_APB2_PERIPH_GPIOD, ENABLE); // LED1
 
     // --- Timers
-    NVIC_InitStructure.NVIC_IRQChannel                   = TIM1_UP_IRQn;
+    NVIC_InitStructure.NVIC_IRQChannel                   = TIM1_UP_IRQn | CAN_RX0_IRQn;
     NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
     NVIC_InitStructure.NVIC_IRQChannelSubPriority        = 1;
     NVIC_InitStructure.NVIC_IRQChannelCmd                = ENABLE;
@@ -44,6 +44,13 @@ void board_init(void) {
     GPIO_InitStructure.GPIO_Pull    = GPIO_Pull_Up;
     GPIO_InitStructure.GPIO_Mode    = GPIO_Mode_Out_PP;
     GPIO_InitPeripheral(SSD1306_RPORT, &GPIO_InitStructure);
+
+    GPIO_InitStruct(&GPIO_InitStructure);
+    GPIO_InitStructure.Pin          = ;
+    GPIO_InitStructure.GPIO_Current = GPIO_DC_4mA;
+    GPIO_InitStructure.GPIO_Pull    = GPIO_Pull_Up;
+    GPIO_InitStructure.GPIO_Mode    = GPIO_Mode_Out_PP;
+    GPIO_InitPeripheral(SSD1306_DPORT, &GPIO_InitStructure);
 
     I2C_DeInit(I2C1);
     i2c1_master.BusMode     = I2C_BUSMODE_I2C;
@@ -70,12 +77,16 @@ void board_init(void) {
     }
 }
 
+#if 0 
 void SysTick_Handler(void) {
     buttons_tick();
 }
+#endif
 
+#if 0
 void SVC_Handler(void) {
 }
+#endif
 
 void DebugMon_Handler(void) {
 }

@@ -2,3 +2,7 @@
 	path = etl
 	branch = 20.39.4
 	url = https://github.com/ETLCPP/etl.git
+[submodule "freertos"]
+	path = freertos
+	url = https://github.com/FreeRTOS/FreeRTOS-Kernel.git
+	branch = V11.1.0
